@@ -1,0 +1,213 @@
+.cw-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--color-ink-navy);
+  color: #d1dde2;
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex-shrink: 0;
+  z-index: 50;
+  transition: transform 0.2s ease;
+}
+
+.cw-sidebar__header {
+  height: var(--topbar-height);
+  padding: 0 var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cw-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+}
+
+.cw-sidebar__brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background-color: var(--color-deep-teal);
+  color: #ffffff;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+}
+
+.cw-sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.cw-sidebar__brand-title {
+  color: #ffffff;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.cw-sidebar__brand-sub {
+  color: #9cb1b8;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cw-sidebar__close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #d1dde2;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.cw-sidebar__close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cw-sidebar__nav {
+  flex: 1;
+  padding: var(--space-4) var(--space-3);
+  overflow-y: auto;
+}
+
+.cw-sidebar__nav-heading {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7d969f;
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.cw-sidebar__nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-sidebar__nav-item {
+  margin: 0;
+}
+
+.cw-sidebar__nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 9px var(--space-3);
+  color: #cad8dd;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  position: relative;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.cw-sidebar__nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* Active Navigation Styling — Restrained Teal Pill & Left Indicator */
+.cw-sidebar__nav-link--active {
+  background-color: rgba(20, 107, 98, 0.25);
+  color: #ffffff;
+  font-weight: var(--font-weight-semibold);
+}
+
+.cw-sidebar__nav-link--active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background-color: #38b2a3;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.cw-sidebar__nav-link--active .cw-sidebar__link-icon {
+  color: #4ed9c7;
+}
+
+.cw-sidebar__link-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #90a7ae;
+}
+
+.cw-sidebar__link-text {
+  flex: 1;
+}
+
+/* Footer Section */
+.cw-sidebar__footer {
+  padding: var(--space-4) var(--space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.cw-sidebar__env-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  color: #a7bcc3;
+  margin-bottom: var(--space-2);
+}
+
+.cw-sidebar__footnote {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #728c95;
+  margin: 0;
+}
+
+/* Overlay for Mobile Drawer */
+.cw-sidebar-overlay {
+  display: none;
+}
+
+/* Responsive Behavior */
+@media (max-width: 768px) {
+  .cw-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .cw-sidebar--open {
+    transform: translateX(0);
+  }
+
+  .cw-sidebar__close-btn {
+    display: inline-flex;
+  }
+
+  .cw-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(16, 31, 39, 0.6);
+    z-index: 45;
+  }
+}

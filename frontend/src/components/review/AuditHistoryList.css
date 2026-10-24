@@ -1,0 +1,124 @@
+/**
+ * AuditHistoryList CSS
+ * Compact, quiet audit timeline for reviewed relationships.
+ */
+
+.cw-audit-list {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cw-audit-list__header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-slate-border);
+}
+
+.cw-audit-list__icon {
+  color: var(--color-text-muted);
+}
+
+.cw-audit-list__title {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cw-audit-list__timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cw-audit-item {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.cw-audit-item__marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cw-audit-item__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+}
+
+.cw-audit-icon--system {
+  color: var(--color-deep-teal);
+}
+
+.cw-audit-icon--success {
+  color: var(--color-success-text);
+}
+
+.cw-audit-icon--neutral {
+  color: var(--color-text-muted);
+}
+
+.cw-audit-icon--warning {
+  color: var(--color-warning-text);
+}
+
+.cw-audit-item__line {
+  flex: 1;
+  width: 1px;
+  background-color: var(--color-slate-border);
+  margin: 2px 0;
+}
+
+.cw-audit-item__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-audit-item__title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cw-audit-item__title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink-navy);
+}
+
+.cw-audit-item__time {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.cw-audit-item__desc {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.cw-audit-item__actor {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}

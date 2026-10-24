@@ -1,0 +1,139 @@
+/**
+ * EvaluationContractPending CSS
+ * Honest, clear notice documenting the pending evaluation endpoint.
+ */
+
+.cw-eval-pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cw-eval-pending__badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cw-eval-pending__status-badge {
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-warning-text);
+  background-color: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+}
+
+.cw-eval-pending__card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cw-eval-pending__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.cw-eval-pending__icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cw-eval-pending__icon {
+  color: var(--color-text-muted);
+}
+
+.cw-eval-pending__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-eval-pending__desc {
+  margin: 4px 0 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.cw-eval-pending__details {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cw-eval-pending__detail-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.cw-eval-pending__detail-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  min-width: 170px;
+}
+
+.cw-eval-pending__code {
+  font-family: var(--font-mono);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--color-ink-navy);
+  font-size: 0.75rem;
+}
+
+.cw-eval-pending__error-text {
+  color: var(--color-error-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.cw-eval-pending__detail-val {
+  color: var(--color-text-primary);
+}
+
+.cw-eval-pending__detail-val code {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-deep-teal);
+}
+
+.cw-eval-pending__integrity-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-info-text);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-relaxed);
+}
+
+.cw-eval-pending__integrity-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+}

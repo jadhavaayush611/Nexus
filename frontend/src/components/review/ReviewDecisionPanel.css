@@ -1,0 +1,269 @@
+/**
+ * ReviewDecisionPanel CSS
+ * Restrained, clear decision controls for human review.
+ */
+
+.cw-decision-panel {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cw-decision-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cw-decision-panel__title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-decision-panel__status-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.cw-decision-panel__status-hint strong {
+  text-transform: capitalize;
+  color: var(--color-deep-teal);
+}
+
+/* Error banner */
+.cw-decision-panel__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-error-text);
+  font-size: var(--font-size-xs);
+}
+
+/* Action buttons container */
+.cw-decision-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cw-decision-cancel-reeval {
+  align-self: center;
+  background: transparent;
+  border: none;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+.cw-decision-cancel-reeval:hover {
+  color: var(--color-text-primary);
+}
+
+/* Sub-forms (Confirm, Dismiss, Needs Info) */
+.cw-decision-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-sm);
+}
+
+.cw-decision-form--confirm {
+  border-left: 3px solid var(--color-deep-teal);
+}
+
+.cw-decision-form--dismiss {
+  border-left: 3px solid var(--color-slate-border-strong);
+}
+
+.cw-decision-form--needs-info {
+  border-left: 3px solid var(--color-accent-sand);
+}
+
+.cw-decision-form__prompt {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink-navy);
+}
+
+.cw-decision-form__subtext {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+}
+
+.cw-decision-form__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink-navy);
+}
+
+.cw-decision-form__req {
+  color: var(--color-error-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cw-decision-form__opt {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.cw-decision-form__textarea {
+  width: 100%;
+  padding: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  resize: vertical;
+}
+
+.cw-decision-form__textarea:focus {
+  border-color: var(--color-deep-teal);
+  box-shadow: 0 0 0 1px var(--color-deep-teal);
+}
+
+.cw-decision-form__textarea--invalid {
+  border-color: var(--color-error-border);
+}
+
+.cw-decision-form__textarea--invalid:focus {
+  border-color: var(--color-error-text);
+  box-shadow: 0 0 0 1px var(--color-error-text);
+}
+
+.cw-decision-form__error-text {
+  font-size: 0.6875rem;
+  color: var(--color-error-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.cw-decision-form__btn-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 4px;
+}
+
+/* Receipt View */
+.cw-decision-panel--receipt {
+  background-color: #fafbfb;
+  border: 1px solid var(--color-slate-border);
+}
+
+.cw-decision-receipt__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-slate-border);
+}
+
+.cw-decision-receipt__title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cw-decision-receipt__icon {
+  color: var(--color-deep-teal);
+}
+
+.cw-decision-receipt__title {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cw-decision-receipt__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cw-decision-receipt__row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-decision-receipt__label {
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.cw-decision-receipt__val {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-relaxed);
+}
+
+.cw-decision-receipt__reason {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  font-style: italic;
+  line-height: var(--line-height-relaxed);
+}
+
+.cw-decision-receipt__meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--color-slate-border);
+}
+
+.cw-decision-receipt__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-decision-receipt__meta-label {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.cw-decision-receipt__meta-val {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.cw-decision-receipt__actions {
+  display: flex;
+  justify-content: flex-end;
+}
