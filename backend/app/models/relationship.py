@@ -80,10 +80,12 @@ class Relationship(Base):
     )
 
     __table_args__ = (
-        # Ensure a complaint cannot form a relationship with itself
+        # Ensure canonical ordering: complaint_a_id must be strictly less than complaint_b_id.
+        # This constraint prevents self-referential relationships (a == b) AND enforces
+        # canonical ordering, rendering reverse pairs (b, a) impossible at the database level.
         CheckConstraint(
-            "complaint_a_id != complaint_b_id",
-            name="check_complaint_distinct",
+            "complaint_a_id < complaint_b_id",
+            name="check_complaint_canonical_order",
         ),
         # Prevent duplicate link pairs between the same complaints
         UniqueConstraint(
