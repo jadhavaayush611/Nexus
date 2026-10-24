@@ -4,33 +4,46 @@ Nexus is an institutional complaint tracking and intelligence prototype designed
 
 ## Scope & Implementation Overview
 
-### Phase 2: Domain Layer & Core API (Current Scope)
+### Phase 3: Explainable Matching, Human Review, & Integration (Current Scope)
 - **FastAPI backend** with Pydantic v2 domain schemas, structured error handling, and CORS middleware for local frontend development.
-- **Institution API**:
-  - `GET /api/institutions`: Paginated listing with case-insensitive name search and dynamically computed complaint counts.
-  - `GET /api/institutions/{id}`: Detail profile with complaint count.
-  - `POST /api/institutions`: Register canonical institution records, enforcing unique non-null `normalized_id` (returns HTTP 409 Conflict on duplicate).
-- **Complaint API**:
-  - `GET /api/complaints`: Multi-criteria filtering by `institution_id`, `bureau`, `status`, `category`, with stable ordering (newest first, ID tiebreaker) and pagination.
-  - `GET /api/complaints/{id}`: Single complaint record detail including institution name.
-  - `POST /api/complaints`: File complaints against verified institutions (returns HTTP 404 if institution nonexistent). Non-unique external references permitted.
-  - `PATCH /api/complaints/{id}`: Update mutable complaint fields (`bureau`, `category`, `description`, `status`, `next_action`, `due_date`) with automatic timestamp updates. Disallows mutating primary key or reassigning institutions.
-- **Dashboard Summary**:
-  - `GET /api/dashboard/summary`: Live database-derived metrics including total institutions, total complaints, status breakdowns, bureau breakdowns, and active overdue complaint counts.
-- **Relationship-Pair Integrity Fix**:
-  - Canonical ordering constraint: `CheckConstraint("complaint_a_id < complaint_b_id")` enforces that `complaint_a_id` is strictly lower than `complaint_b_id`, preventing self-pairs and rendering reverse pairs impossible at the database level.
-  - Symmetrical service layer: `app.services.relationship_service.create_or_get_relationship()` automatically normalizes arbitrary input order into canonical order before persistence.
-- **Fictional Demo-Data Seeding**:
-  - Standalone script [`app/db/seed.py`](file:///D:/Nexus/backend/app/db/seed.py) providing non-destructive, idempotent seeding of 5 fictional institutions and 10 realistic multi-bureau complaint records.
+- **Explainable Candidate Matching Engine**:
+  - Deterministic TF-IDF cosine text similarity (scikit-learn) paired with category agreement and temporal proximity.
+  - Institution identity acts as a primary eligibility gate (no cross-institution matching).
+  - Configurable weighting: 60% text similarity, 25% category agreement, 15% temporal proximity.
+  - Transparent evidence payload: returns description overlap, category match, temporal difference, score band (`High` >= 0.75, `Review` >= 0.45, `Weak` < 0.45), signal checklist, and human-readable explanation.
+  - Endpoints: `POST /api/matching/suggest/{complaint_id}` and bounded batch pass `POST /api/matching/suggest-all`.
+  - Suggestions require human review; complaints are never automatically merged, modified, or closed.
+- **Human-in-the-Loop Review Workflow**:
+  - `POST /api/relationships/{id}/review`: Accepts review decisions (`confirmed`, `dismissed`, `needs_info`).
+  - Dismissals strictly mandate an explanatory `review_reason`.
+  - Re-review is supported to allow operators to adjust decisions as new evidence emerges.
+  - Preserves original complaint records independently (no destructive merges).
+- **Immutable Audit Trail**:
+  - Automatically records chronological `AuditEvent` records for suggestion generation, relationship confirmation, dismissal, and inquiries.
+  - `GET /api/audit-events`: Paginated, read-only endpoint with filtering by `entity_type`, `entity_id`, and `action`.
+- **Bounded CSV Complaint Import**:
+  - `POST /api/import/csv`: Accepts multipart CSV uploads with a 2 MB size limit and 500-row limit.
+  - Validates required headers (`description`, `bureau`, and either `institution_id` or `normalized_id`).
+  - Row-by-row transaction isolation: invalid rows are reported with 1-indexed row numbers without aborting valid imports.
+- **Synthetic Benchmark Evaluation**:
+  - `GET /api/evaluation/summary`: Evaluates deterministic matching against an explicit labelled synthetic dataset (positive pairs and hard negatives).
+  - Computes precision, recall, F1, and confusion matrix counts safely with zero-denominator guards. Discloses synthetic nature.
+- **Institution & Complaint APIs**:
+  - Institution create, list, search, and detail endpoints with complaint counts.
+  - Complaint multi-criteria filtering (`institution_id`, `bureau`, `status`, `category`), pagination, and partial updates (`PATCH`).
+- **Dashboard Metrics**:
+  - `GET /api/dashboard/summary`: Live database metrics, status breakdowns, bureau breakdowns, and active overdue case counts.
+- **Relationship-Pair Integrity & Migration**:
+  - Canonical ordering constraint: `CheckConstraint("complaint_a_id < complaint_b_id")` prevents self-pairs and reverse-order duplicates.
+  - Non-destructive SQLite migration utility [`app/db/migrate.py`](file:///D:/Nexus/backend/app/db/migrate.py) with automated pre-migration backup (`.db.bak`).
 - **Automated Tests**:
-  - 33 isolated pytest tests verifying health, institutions, complaints, dashboard metrics, seeding idempotency, and relationship canonical constraints.
+  - 54 isolated pytest tests across all modules operating against in-memory SQLite.
 
-### Limitations & Out-of-Scope Features
-- **AI/NLP Matching Engine**: Text embeddings, TF-IDF cosine similarity scoring, and automated candidate match generation are scheduled for subsequent phases.
-- **CSV Bulk Import**: CSV parsing, row-level validation, and error reporting pipelines are scheduled for Phase 3.
-- **Relationship Review Workflow**: Full frontend review workspace (confirming, dismissing, or auditing links) is not yet attached.
-- **Authentication**: No live auth or user management; all endpoints operate in development mode with fictional demo roles.
-- **Synthetic Data Only**: Nexus is a student prototype; it contains no real institutional records or personal data.
+### Explicitly Out-of-Scope Limitations
+- **Live External Integrations**: No direct connection to official government portals (e.g. CPGRAMS); operates entirely on local demo data.
+- **Custom-Trained Deep Learning Models**: Uses deterministic scikit-learn TF-IDF and rules rather than black-box neural networks.
+- **Automatic Complaint Merging/Closing**: Suggestions remain independent links; cases are never merged or closed by the algorithm.
+- **Authentication**: No live auth or session tokens; endpoints use fictional demo roles (e.g., `demo-reviewer`).
 
 ---
 
@@ -99,30 +112,17 @@ Copy-Item backend/.env.example backend/.env
 cp backend/.env.example backend/.env
 ```
 
-Available environment variables:
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `DATABASE_URL` | `sqlite:///<absolute-path-to-backend>/nexus.db` | SQLAlchemy database connection string |
-| `ENVIRONMENT` | `development` | Deployment environment name |
-| `CORS_ORIGINS` | `["http://localhost:3000", "http://localhost:5173"]` | JSON array of allowed origins for CORS |
-
 ---
 
 ## Seeding Fictional Demo Data
 
-Nexus includes a non-destructive, idempotent demo data seed script. It inserts 5 fictional institutions and 10 complaints across 5 bureaus (`Anti-Ragging Cell`, `Student Welfare Cell`, `Fee Regulation Cell`, `Examinations Bureau`, `Women Grievance Cell`).
+Nexus includes an idempotent demo data seed script. It inserts 5 fictional institutions and 10 complaints across 5 bureaus (`Anti-Ragging Cell`, `Student Welfare Cell`, `Fee Regulation Cell`, `Examinations Bureau`, `Women Grievance Cell`).
 
 From the `backend/` directory:
 
 ```bash
 cd backend
 python app/db/seed.py
-```
-
-Alternatively, from the repository root:
-
-```bash
-python -m backend.app.db.seed
 ```
 
 Re-running the script is safe and idempotent: existing records are detected by `normalized_id` or `(institution_id, external_ref)` and skipped without duplication.
@@ -138,170 +138,167 @@ cd backend
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Alternatively, from the repository root:
-
-```bash
-python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --reload
-```
-
----
-
-## API Endpoints & Usage
-
-### 1. Health Probe
-- **`GET /api/health`**
-  - Verifies service availability and executes `SELECT 1` against SQLite.
-  - Returns HTTP 200 when healthy:
-    ```json
-    {
-      "status": "ok",
-      "service": "nexus-backend"
-    }
-    ```
-  - Returns HTTP 503 if the database is unreachable.
-
-### 2. Institutions
-- **`GET /api/institutions?limit=50&offset=0&search=apex`**
-  - Returns paginated institutions with total count and complaint counts.
-  - Response (HTTP 200):
-    ```json
-    {
-      "items": [
-        {
-          "id": 1,
-          "name": "Apex Institute of Technology & Science",
-          "normalized_id": "AITS-DEMO-001",
-          "aliases": ["AITS", "Apex Tech"],
-          "created_at": "2026-10-24T21:15:00Z",
-          "complaint_count": 3
-        }
-      ],
-      "total": 1,
-      "limit": 50,
-      "offset": 0
-    }
-    ```
-- **`GET /api/institutions/{id}`**
-  - Returns single institution profile. Returns HTTP 404 if not found.
-- **`POST /api/institutions`**
-  - Creates a new institution. Returns HTTP 201 on success or HTTP 409 Conflict if `normalized_id` already exists.
-  - Request body:
-    ```json
-    {
-      "name": "Beacon National Polytechnic",
-      "normalized_id": "BNP-DEMO-002",
-      "aliases": ["BNP", "Beacon Poly"]
-    }
-    ```
-
-### 3. Complaints
-- **Lifecycle Statuses**:
-  - Active: `open`, `under_investigation`
-  - Terminal: `resolved`, `dismissed`, `closed`
-- **`GET /api/complaints?institution_id=1&bureau=Anti-Ragging%20Cell&status=open&limit=20&offset=0`**
-  - Filters by institution, bureau, status, and category. Stable sorting by `created_at DESC`, `id DESC`.
-  - Response (HTTP 200):
-    ```json
-    {
-      "items": [
-        {
-          "id": 1,
-          "institution_id": 1,
-          "institution_name": "Apex Institute of Technology & Science",
-          "bureau": "Anti-Ragging Cell",
-          "description": "Fictional case: Unauthorized late-night gathering reported near hostel.",
-          "external_ref": "ARC-2026-0101",
-          "category": "Disciplinary & Safety",
-          "status": "open",
-          "next_action": "Issue formal inquiry notice to chief warden",
-          "due_date": "2026-10-29T21:15:00Z",
-          "created_at": "2026-10-24T21:15:00Z",
-          "updated_at": "2026-10-24T21:15:00Z"
-        }
-      ],
-      "total": 1,
-      "limit": 20,
-      "offset": 0
-    }
-    ```
-- **`POST /api/complaints`**
-  - Files a new complaint against an existing institution. Returns HTTP 201 or HTTP 404 if `institution_id` does not exist.
-  - Request body:
-    ```json
-    {
-      "institution_id": 1,
-      "bureau": "Student Welfare Cell",
-      "description": "Drinking water filtration plant offline in residential block.",
-      "category": "Infrastructure & Maintenance",
-      "status": "open",
-      "next_action": "Facility maintenance inspection dispatch scheduled"
-    }
-    ```
-- **`GET /api/complaints/{id}`**
-  - Returns single complaint record. Returns HTTP 404 if not found.
-- **`PATCH /api/complaints/{id}`**
-  - Updates mutable fields (`bureau`, `category`, `description`, `status`, `next_action`, `due_date`). Updates `updated_at` automatically. Primary key and `institution_id` cannot be modified.
-  - Request body:
-    ```json
-    {
-      "status": "under_investigation",
-      "next_action": "Inspection underway"
-    }
-    ```
-
-### 4. Dashboard Summary
-- **`GET /api/dashboard/summary`**
-  - Returns live database metrics.
-  - Overdue rule: count of complaints where `due_date < now()` and status is NOT in terminal statuses (`resolved`, `dismissed`, `closed`).
-  - Response (HTTP 200):
-    ```json
-    {
-      "total_institutions": 5,
-      "total_complaints": 10,
-      "status_counts": {
-        "open": 5,
-        "under_investigation": 3,
-        "resolved": 1,
-        "closed": 1
-      },
-      "bureau_counts": {
-        "Anti-Ragging Cell": 2,
-        "Student Welfare Cell": 2,
-        "Fee Regulation Cell": 2,
-        "Examinations Bureau": 2,
-        "Women Grievance Cell": 2
-      },
-      "overdue_complaints": 2
-    }
-    ```
-
-### 5. Interactive API Documentation
+Interactive documentation:
 - **Swagger UI**: `http://127.0.0.1:8000/docs`
 - **ReDoc**: `http://127.0.0.1:8000/redoc`
 - **OpenAPI JSON Schema**: `http://127.0.0.1:8000/openapi.json`
 
 ---
 
-## Relationship-Pair Integrity & SQLite Migration Note
+## Core API Endpoints
 
-In Phase 1, relationship records could theoretically be persisted in both forward `(a, b)` and reverse `(b, a)` order.
+### 1. Health Probe
+- **`GET /api/health`**
+  - Verifies service availability and database connectivity via `SELECT 1`.
+  - Response (`200 OK`): `{"status": "ok", "service": "nexus-backend"}`.
 
-### Phase 2 Fix
-1. **Database Check Constraint**:
-   `CheckConstraint("complaint_a_id < complaint_b_id", name="check_complaint_canonical_order")`
-   This ensures `complaint_a_id` is strictly lower than `complaint_b_id`. It blocks self-referential pairs and makes storing reverse pairs impossible at the database level.
-2. **Service Layer Normalization**:
-   [`app.services.relationship_service.create_or_get_relationship()`](file:///D:/Nexus/backend/app/services/relationship_service.py) automatically orders inputs as `min(id1, id2), max(id1, id2)` and rejects self-pairs.
+### 2. Candidate Matching
+- **Matching Weights**: 60% description similarity (TF-IDF + cosine), 25% category agreement, 15% temporal proximity.
+- **Score Bands**:
+  - `High` (>= 0.75): Strong candidate with matching category and high text similarity.
+  - `Review` (>= 0.45): Plausible candidate warranting operator review.
+  - `Weak` (< 0.45): Below threshold; not suggested.
+- **`POST /api/matching/suggest/{complaint_id}?min_threshold=0.45`**
+  - Generates candidates within the same institution. Reuses existing suggestions without overwriting human decisions.
+  - Response (`200 OK`):
+    ```json
+    {
+      "source_complaint_id": 1,
+      "total_candidates": 1,
+      "candidates": [
+        {
+          "complaint": {
+            "id": 2,
+            "institution_id": 1,
+            "institution_name": "Apex Institute of Technology & Science",
+            "bureau": "Student Welfare Cell",
+            "category": "Safety",
+            "description": "Hostel block A freshmen intimidation reported.",
+            "status": "open"
+          },
+          "score": 0.82,
+          "score_band": "High",
+          "evidence": {
+            "overall_score": 0.82,
+            "score_band": "High",
+            "description_similarity": 0.78,
+            "category_match": true,
+            "category_similarity": 1.0,
+            "temporal_proximity_days": 2.1,
+            "temporal_similarity": 1.0,
+            "institution_match": true,
+            "signals": [
+              "Institution identity match (ID 1)",
+              "Description text similarity: 0.78",
+              "Matching category: 'Safety'",
+              "Filed 2.1 days apart"
+            ]
+          },
+          "explanation": "High-confidence candidate (0.82) at same institution. Description similarity is 0.78 across bureaus 'Anti-Ragging Cell' and 'Student Welfare Cell'."
+        }
+      ]
+    }
+    ```
+- **`POST /api/matching/suggest-all?max_complaints=100&min_threshold=0.45`**
+  - Batch generation pass across database records.
+  - Response (`200 OK`):
+    ```json
+    {
+      "evaluated_complaints": 12,
+      "candidates_considered": 18,
+      "suggestions_created": 2,
+      "suggestions_reused": 0,
+      "candidates_rejected": 16
+    }
+    ```
 
-### SQLite Migration Approach
-SQLite does not support altering constraints on existing tables via `ALTER TABLE`. SQLAlchemy `create_all()` is idempotent and applies the constraint to newly created databases, but will not modify an already existing table.
-- **For fresh setups**: The constraint is applied automatically on first startup.
-- **For existing development databases**: Run the controlled migration utility [`app/db/migrate.py`](file:///D:/Nexus/backend/app/db/migrate.py), which automatically creates a pre-migration backup (`nexus.db.bak`) and executes a non-destructive SQLite table rebuild transaction:
-  ```bash
-  cd backend
-  python app/db/migrate.py
-  ```
-  Alternatively, if local development data is disposable, deleting `backend/nexus.db` and restarting will recreate the schema fresh.
+### 3. Relationships & Human Review
+- **`GET /api/relationships?state=suggested&complaint_id=1&limit=50&offset=0`**
+  - Lists relationships with complaint summaries and evidence payloads.
+- **`GET /api/relationships/{id}`**
+  - Detailed view of a single relationship.
+- **`POST /api/relationships/{id}/review`**
+  - Submits human review decision (`confirmed`, `dismissed`, `needs_info`).
+  - Dismissals require non-empty `review_reason`.
+  - Request body:
+    ```json
+    {
+      "decision": "confirmed",
+      "review_reason": "Verified cross-cell duplicate incident.",
+      "actor": "ombudsman-officer-42"
+    }
+    ```
+
+### 4. Audit Trail
+- **`GET /api/audit-events?entity_type=relationship&action=relationship_confirmed&limit=50&offset=0`**
+  - Chronological read-only audit log tracking suggestions and operator review decisions.
+
+### 5. CSV Complaint Import
+- **`POST /api/import/csv`**
+  - Multipart form upload (`file`). Limit: 2 MB, 500 rows.
+  - Required header columns: `description`, `bureau`, and either `institution_id` or `normalized_id`.
+  - Optional header columns: `category`, `external_ref`, `status`, `next_action`, `due_date`.
+  - Response (`200 OK`):
+    ```json
+    {
+      "total_rows": 3,
+      "imported_rows": 2,
+      "skipped_rows": 1,
+      "errors": [
+        {
+          "row": 3,
+          "error": "Institution not found for reference 'NONEXISTENT-CODE'."
+        }
+      ]
+    }
+    ```
+
+### 6. Synthetic Benchmark Evaluation
+- **`GET /api/evaluation/summary?threshold=0.45`**
+  - Computes precision, recall, F1, and confusion matrix against a labelled synthetic test fixture.
+  - Response (`200 OK`):
+    ```json
+    {
+      "synthetic_evaluation": true,
+      "positive_pairs": 3,
+      "negative_pairs": 3,
+      "threshold": 0.45,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "confusion_matrix": {
+        "true_positives": 3,
+        "false_positives": 0,
+        "true_negatives": 3,
+        "false_negatives": 0
+      },
+      "disclaimer": "Evaluation metrics are calculated on an explicit synthetic test fixture containing labelled positive and hard-negative pairs. This prototype does not claim custom model training or real-world accuracy guarantees."
+    }
+    ```
+
+### 7. Institutions & Complaints Management
+- `GET /api/institutions` / `POST /api/institutions` / `GET /api/institutions/{id}`
+- `GET /api/complaints` / `POST /api/complaints` / `GET /api/complaints/{id}` / `PATCH /api/complaints/{id}`
+- `GET /api/dashboard/summary`
+
+---
+
+## Relationship-Pair Integrity & SQLite Migration
+
+### Canonical Constraint
+[`Relationship`](file:///D:/Nexus/backend/app/models/relationship.py) enforces:
+```python
+CheckConstraint("complaint_a_id < complaint_b_id", name="check_complaint_canonical_order")
+```
+This guarantees that `complaint_a_id` is always strictly less than `complaint_b_id`. Self-pairs are rejected and reverse-order duplicates are impossible.
+
+### Non-Destructive Migration Script
+To apply the constraint to an existing development database without losing data, run:
+```bash
+cd backend
+python app/db/migrate.py
+```
+This utility automatically creates a pre-migration backup (`nexus.db.bak`) and performs a safe SQLite table rebuild transaction.
 
 ---
 
