@@ -796,7 +796,7 @@ def evaluate_matching_pipeline(
         "Hard negatives test same-institution topic divergence, cross-institution text overlap, and short descriptions.",
         "Decision threshold is set at 0.45 for 'Review' suggestions and 0.75 for 'High' confidence suggestions.",
         "Baseline matcher uses raw word intersection (Jaccard similarity) without category weights or temporal signals.",
-        "The multi-signal approach achieves significantly higher recall (+30%) on paraphrased cross-bureau wording.",
+        "On this synthetic benchmark, recall is 1.00 for the multi-signal matcher and 0.20 for the baseline (an 80-percentage-point difference).",
         "Limitation: Evaluated on synthetic records; does not claim production AICTE accuracy guarantees.",
     ]
 
