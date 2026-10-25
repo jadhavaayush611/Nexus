@@ -1,0 +1,111 @@
+.cw-overview {
+  padding-bottom: var(--space-12);
+}
+
+.cw-overview__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Dataset Reset Notification Banner */
+.cw-overview__banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.cw-overview__banner--notice {
+  background-color: var(--color-deep-teal-light);
+  border: 1px solid var(--color-deep-teal);
+  color: var(--color-deep-teal);
+}
+
+.cw-overview__banner-dismiss {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* Metric Cards Grid */
+.cw-overview__metrics {
+  margin-bottom: var(--space-6);
+}
+
+.cw-overview__metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.cw-overview__section {
+  margin-bottom: var(--space-6);
+}
+
+/* Timeline */
+.cw-overview__timeline {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+}
+
+.cw-overview__timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.cw-overview__timeline-marker {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  color: var(--color-deep-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cw-overview__timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-overview__timeline-title {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink-navy);
+}
+
+.cw-overview__timeline-actor {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+  .cw-overview__metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .cw-overview__metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,37 @@
+.cw-synthetic-banner {
+  background-color: var(--color-ink-navy);
+  color: var(--color-text-inverse);
+  padding: 6px var(--space-4);
+  font-size: var(--font-size-xs);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 100;
+}
+
+.cw-synthetic-banner__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.cw-synthetic-banner__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--color-accent-sand);
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  font-size: 0.7rem;
+}
+
+.cw-synthetic-banner__text {
+  color: #c9d6db;
+}

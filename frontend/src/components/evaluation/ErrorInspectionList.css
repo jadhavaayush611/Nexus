@@ -1,0 +1,194 @@
+/**
+ * ErrorInspectionList CSS
+ * Diagnostic card list making false positives and false negatives easy to inspect.
+ */
+
+.cw-error-inspect-wrapper {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cw-error-inspect-wrapper--empty {
+  background-color: var(--color-surface-subtle);
+  border-style: dashed;
+}
+
+.cw-error-inspect-empty-text {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.cw-error-inspect-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.cw-error-inspect-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-error-inspect-subtitle {
+  margin: 2px 0 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.cw-error-inspect-tabs {
+  display: flex;
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: 2px;
+  gap: 2px;
+}
+
+.cw-error-inspect-tab {
+  padding: 5px 10px;
+  font-size: 0.725rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cw-error-inspect-tab:hover {
+  color: var(--color-ink-navy);
+}
+
+.cw-error-inspect-tab--active {
+  background-color: var(--color-surface);
+  color: var(--color-deep-teal);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.cw-error-inspect-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: var(--space-3);
+}
+
+@media (max-width: 600px) {
+  .cw-error-inspect-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cw-error-inspect-card {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cw-error-inspect-card--fp {
+  border-left: 3px solid var(--color-error-border);
+}
+
+.cw-error-inspect-card--fn {
+  border-left: 3px solid var(--color-warning-border);
+}
+
+.cw-error-inspect-card--tp {
+  border-left: 3px solid var(--color-success-border);
+}
+
+.cw-error-inspect-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cw-error-inspect-card__refs {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cw-error-inspect-card__ref {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink-navy);
+}
+
+.cw-error-inspect-card__vs {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.cw-error-inspect-card__inst {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cw-error-inspect-card__inst-name {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.cw-error-inspect-card__score {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+
+.cw-error-inspect-card__reason {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-error-inspect-card__reason-label {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.cw-error-inspect-card__reason-text {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.cw-error-inspect-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  border-top: 1px dashed var(--color-slate-border);
+  padding-top: 4px;
+}
+
+.cw-error-inspect-card__meta-item strong {
+  color: var(--color-ink-navy);
+  text-transform: capitalize;
+}

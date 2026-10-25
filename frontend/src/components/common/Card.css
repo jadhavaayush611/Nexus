@@ -1,0 +1,73 @@
+.cw-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cw-card--interactive {
+  cursor: pointer;
+}
+
+.cw-card--interactive:hover {
+  border-color: var(--color-slate-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.cw-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-slate-border);
+}
+
+.cw-card__title {
+  color: var(--color-ink-navy);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cw-card__subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+}
+
+.cw-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Padding variations for body */
+.cw-card--padding-none .cw-card__body {
+  padding: 0;
+}
+
+.cw-card--padding-sm .cw-card__body {
+  padding: var(--space-3);
+}
+
+.cw-card--padding-md .cw-card__body {
+  padding: var(--space-5);
+}
+
+.cw-card--padding-lg .cw-card__body {
+  padding: var(--space-6);
+}
+
+.cw-card__footer {
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-surface-subtle);
+  border-top: 1px solid var(--color-slate-border);
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
