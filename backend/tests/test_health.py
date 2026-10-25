@@ -303,13 +303,14 @@ def test_relationship_duplicate_pair_in_same_order_rejected(db_session: Session)
     db_session.rollback()
 
 
-def test_relationship_reverse_pair_observed_behavior(db_session: Session):
+def test_relationship_reverse_pair_rejected_by_canonical_constraint(db_session: Session):
     """
-    Demonstrate that the schema currently permits reverse pairs (c2, c1) alongside (c1, c2)
-    because the database-level constraint is an ordered UniqueConstraint(complaint_a_id, complaint_b_id).
-    This serves as verified evidence for Section 3 integrity audit.
+    Verify that the database-level CheckConstraint('complaint_a_id < complaint_b_id')
+    strictly rejects inserting reverse pairs (c2, c1) when c2.id > c1.id.
     """
-    inst = Institution(name="Reverse Pair Audit Institute")
+    from app.services.relationship_service import create_or_get_relationship
+
+    inst = Institution(name="Canonical Pair Audit Institute")
     db_session.add(inst)
     db_session.commit()
 
@@ -318,18 +319,27 @@ def test_relationship_reverse_pair_observed_behavior(db_session: Session):
     db_session.add_all([c1, c2])
     db_session.commit()
 
+    # Ensure c1 has smaller id than c2
+    assert c1.id < c2.id
+
+    # Inserting forward pair directly succeeds
     rel_forward = Relationship(complaint_a_id=c1.id, complaint_b_id=c2.id, state="suggested")
     db_session.add(rel_forward)
     db_session.commit()
 
+    # Inserting reverse pair directly violates check_complaint_canonical_order
     rel_reverse = Relationship(complaint_a_id=c2.id, complaint_b_id=c1.id, state="suggested")
     db_session.add(rel_reverse)
-    # Permitted by current schema:
-    db_session.commit()
+    with pytest.raises(IntegrityError):
+        db_session.commit()
+    db_session.rollback()
 
-    assert rel_forward.id is not None
-    assert rel_reverse.id is not None
-    assert rel_forward.id != rel_reverse.id
+    # Verify that the service layer normalizes reverse order requests
+    rel_retrieved, created = create_or_get_relationship(db_session, c2.id, c1.id)
+    assert created is False
+    assert rel_retrieved.id == rel_forward.id
+    assert rel_retrieved.complaint_a_id == c1.id
+    assert rel_retrieved.complaint_b_id == c2.id
 
 
 def test_health_endpoint_db_failure_returns_503(client: TestClient):

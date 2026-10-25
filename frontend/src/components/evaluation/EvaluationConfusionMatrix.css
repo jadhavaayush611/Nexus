@@ -1,0 +1,202 @@
+/**
+ * EvaluationConfusionMatrix CSS
+ * Accessible 2x2 matrix with precise borders, subtle semantic tints, and count percentages.
+ */
+
+.cw-cm-wrapper {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cw-cm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.cw-cm-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-cm-subtitle {
+  margin: 2px 0 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.cw-cm-total-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-deep-teal);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.cw-cm-table-container {
+  overflow-x: auto;
+}
+
+.cw-cm-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: var(--space-2);
+}
+
+.cw-cm-th {
+  padding: var(--space-2);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.cw-cm-th--corner {
+  background-color: transparent;
+  width: 140px;
+}
+
+.cw-cm-axis-label {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cw-cm-th--col-header {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  padding: var(--space-2) var(--space-3);
+}
+
+.cw-cm-col-title {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-cm-col-sub {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.cw-cm-th--row-header {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+}
+
+.cw-cm-row-title {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-cm-row-sub {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+/* Quadrant Cells */
+.cw-cm-td {
+  padding: 0;
+  vertical-align: top;
+  width: 50%;
+}
+
+.cw-cm-cell {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-slate-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-height: 110px;
+}
+
+.cw-cm-td--tp .cw-cm-cell {
+  background-color: var(--color-success-bg);
+  border-color: var(--color-success-border);
+}
+
+.cw-cm-td--fp .cw-cm-cell {
+  background-color: var(--color-error-bg);
+  border-color: var(--color-error-border);
+}
+
+.cw-cm-td--fn .cw-cm-cell {
+  background-color: var(--color-warning-bg);
+  border-color: var(--color-warning-border);
+}
+
+.cw-cm-td--tn .cw-cm-cell {
+  background-color: var(--color-surface-subtle);
+  border-color: var(--color-slate-border);
+}
+
+.cw-cm-cell__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cw-cm-cell__tag {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cw-cm-cell__tag--tp {
+  color: var(--color-success-text);
+}
+
+.cw-cm-cell__tag--fp {
+  color: var(--color-error-text);
+}
+
+.cw-cm-cell__tag--fn {
+  color: var(--color-warning-text);
+}
+
+.cw-cm-cell__tag--tn {
+  color: var(--color-text-muted);
+}
+
+.cw-cm-cell__pct {
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.cw-cm-cell__count {
+  font-size: 1.5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink-navy);
+  line-height: 1;
+  margin: 2px 0;
+}
+
+.cw-cm-cell__desc {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}

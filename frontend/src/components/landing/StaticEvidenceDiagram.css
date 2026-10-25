@@ -1,0 +1,20 @@
+.cw-static-diagram {
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-md);
+  margin: 0 auto;
+}
+
+.cw-static-diagram__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.cw-diagram__thread {
+  transition: stroke-dasharray 0.3s ease, stroke 0.3s ease;
+}

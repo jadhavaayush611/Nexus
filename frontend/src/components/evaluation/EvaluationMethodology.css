@@ -1,0 +1,164 @@
+/**
+ * EvaluationMethodology CSS
+ * Clean presentation of pipeline steps and operational limitations.
+ */
+
+.cw-method-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cw-method-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cw-method-section--limitations {
+  background-color: var(--color-surface-subtle);
+}
+
+.cw-method-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.cw-method-icon {
+  color: var(--color-deep-teal);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.cw-method-icon--warning {
+  color: var(--color-warning-text);
+}
+
+.cw-method-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-method-subtitle {
+  margin: 2px 0 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* 4-step Pipeline */
+.cw-method-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 1024px) {
+  .cw-method-pipeline {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .cw-method-pipeline {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cw-method-step {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cw-method-step__num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--color-deep-teal);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cw-method-step__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cw-method-step__title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+  line-height: 1.3;
+}
+
+.cw-method-step__desc {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Limitations Cards */
+.cw-method-limits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 900px) {
+  .cw-method-limits-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cw-method-limit-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cw-method-limit-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cw-method-limit-icon {
+  color: var(--color-accent-sand);
+  flex-shrink: 0;
+}
+
+.cw-method-limit-card__title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-method-limit-card__text {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
