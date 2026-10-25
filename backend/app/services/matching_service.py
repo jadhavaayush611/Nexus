@@ -1,6 +1,7 @@
 from datetime import datetime
+import re
 from typing import Any, Dict, List, Optional, Set, Tuple
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sqlalchemy.orm import Session
 from app.models.audit_event import AuditEvent
@@ -10,22 +11,40 @@ from app.schemas.matching import CandidateSuggestion, ComplaintSummary
 from app.services.relationship_service import normalize_relationship_pair
 
 # Centrally configured prototype matching weights and score bands
-WEIGHT_DESCRIPTION: float = 0.60
+WEIGHT_DESCRIPTION: float = 0.55
 WEIGHT_CATEGORY: float = 0.25
 WEIGHT_TEMPORAL: float = 0.15
+WEIGHT_REFERENCE: float = 0.05
 
 HIGH_CONFIDENCE_THRESHOLD: float = 0.75
 REVIEW_CANDIDATE_THRESHOLD: float = 0.45
+
+# Minimum characters needed for meaningful TF-IDF comparison
+MIN_TEXT_LENGTH_FOR_TFIDF: int = 5
+
+
+def extract_matched_terms(text1: str, text2: str, max_terms: int = 6) -> List[str]:
+    """
+    Extracts informative overlapping vocabulary tokens between two texts.
+    Ignores common English stopwords and short tokens (<3 chars).
+    """
+    t1 = (text1 or "").lower()
+    t2 = (text2 or "").lower()
+    tokens1 = set(re.findall(r"\b[a-z]{3,}\b", t1))
+    tokens2 = set(re.findall(r"\b[a-z]{3,}\b", t2))
+    overlap = tokens1.intersection(tokens2) - set(ENGLISH_STOP_WORDS)
+    return sorted(list(overlap))[:max_terms]
 
 
 def compute_text_similarity(text1: str, text2: str) -> float:
     """
     Computes TF-IDF cosine similarity between two description texts using scikit-learn.
     Returns a bounded float between 0.0 and 1.0.
+    Handles empty, whitespace-only, and short text safely.
     """
     t1 = (text1 or "").strip()
     t2 = (text2 or "").strip()
-    if not t1 or not t2:
+    if len(t1) < MIN_TEXT_LENGTH_FOR_TFIDF or len(t2) < MIN_TEXT_LENGTH_FOR_TFIDF:
         return 0.0
 
     if t1.lower() == t2.lower():
@@ -48,6 +67,30 @@ def compute_text_similarity(text1: str, text2: str) -> float:
             return 0.0
         jaccard = len(words1 & words2) / len(words1 | words2)
         return float(jaccard)
+
+
+def compute_reference_similarity(ref1: Optional[str], ref2: Optional[str]) -> Tuple[float, str]:
+    """
+    Evaluates reference compatibility or shared filing codes.
+    Returns (score, status_description).
+    Note: Different references do not block relationship suggestion.
+    """
+    r1 = (ref1 or "").strip().upper()
+    r2 = (ref2 or "").strip().upper()
+
+    if not r1 or not r2:
+        return 0.0, "Reference unassigned or not provided on one/both records"
+
+    if r1 == r2:
+        return 1.0, f"Identical external reference '{r1}'"
+
+    # Check for common root / prefix (e.g. CASE-2026-101 vs CASE-2026-101-REV)
+    clean1 = re.sub(r"[-_/]", "", r1)
+    clean2 = re.sub(r"[-_/]", "", r2)
+    if clean1 in clean2 or clean2 in clean1:
+        return 0.7, f"Shared reference root between '{r1}' and '{r2}'"
+
+    return 0.0, f"Distinct references ('{r1}' vs '{r2}'); cross-bureau difference expected"
 
 
 def compute_category_similarity(cat1: Optional[str], cat2: Optional[str]) -> Tuple[float, bool]:
@@ -98,32 +141,54 @@ def score_complaint_pair(c1: Complaint, c2: Complaint) -> Tuple[float, str, Dict
     """
     Calculates deterministic explainable similarity between two complaints.
     Institution identity acts as a strict primary gate.
+    Returns (overall_score, score_band, evidence_dict, explanation).
     """
     # Gate: Different institutions cannot match in this prototype
     if c1.institution_id != c2.institution_id:
-        return 0.0, "Weak", {"institution_match": False}, "Institutions do not match."
+        return (
+            0.0,
+            "Weak",
+            {
+                "institution_match": False,
+                "overall_score": 0.0,
+                "score_band": "Weak",
+                "signals": ["Institution mismatch: complaints belong to separate educational institutions."],
+            },
+            "Institutions do not match.",
+        )
 
-    # 1. Text description similarity (60%)
+    # 1. Text description similarity
     desc_sim = compute_text_similarity(c1.description, c2.description)
+    matched_terms = extract_matched_terms(c1.description, c2.description)
 
-    # 2. Category agreement (25%)
+    # 2. Category agreement
     cat_sim, cat_match = compute_category_similarity(c1.category, c2.category)
 
-    # 3. Temporal proximity (15%)
+    # 3. Temporal proximity
     time_sim, days_diff = compute_temporal_similarity(c1.created_at, c2.created_at)
 
-    # Combined bounded score
-    overall_score = round(
-        (WEIGHT_DESCRIPTION * desc_sim) + (WEIGHT_CATEGORY * cat_sim) + (WEIGHT_TEMPORAL * time_sim),
-        4,
+    # 4. Reference compatibility
+    ref_sim, ref_desc = compute_reference_similarity(
+        getattr(c1, "external_ref", None), getattr(c2, "external_ref", None)
     )
-    overall_score = max(0.0, min(1.0, overall_score))
+
+    # Combined bounded score with centralized weights
+    raw_score = (
+        (WEIGHT_DESCRIPTION * desc_sim)
+        + (WEIGHT_CATEGORY * cat_sim)
+        + (WEIGHT_TEMPORAL * time_sim)
+        + (WEIGHT_REFERENCE * ref_sim)
+    )
+    overall_score = round(max(0.0, min(1.0, raw_score)), 4)
     band = determine_score_band(overall_score)
 
     signals: List[str] = [
         f"Institution identity match (ID {c1.institution_id})",
         f"Description text similarity: {desc_sim:.2f}",
     ]
+    if matched_terms:
+        signals.append(f"Overlapping terminology: {', '.join(matched_terms)}")
+
     if cat_match:
         signals.append(f"Matching category: '{c1.category}'")
     elif c1.category and c2.category:
@@ -132,7 +197,41 @@ def score_complaint_pair(c1: Complaint, c2: Complaint) -> Tuple[float, str, Dict
     if days_diff is not None:
         signals.append(f"Filed {days_diff} days apart")
 
-    # Concise explanation rationale
+    signals.append(ref_desc)
+
+    # Structured signal items for UI presentation
+    signals_list = [
+        {
+            "name": "Institution Verification",
+            "score": 1.0,
+            "direction": "supports",
+            "explanation": f"Both records filed under Institution ID {c1.institution_id}",
+            "observed_value": str(c1.institution_id),
+        },
+        {
+            "name": "Text Similarity (TF-IDF)",
+            "score": round(desc_sim, 2),
+            "direction": "supports" if desc_sim >= 0.35 else "neutral",
+            "explanation": f"Linguistic cosine overlap of {desc_sim:.2f} using domain TF-IDF",
+            "observed_value": ", ".join(matched_terms) if matched_terms else "No distinct overlap",
+        },
+        {
+            "name": "Category Compatibility",
+            "score": round(cat_sim, 2),
+            "direction": "supports" if cat_match else "neutral",
+            "explanation": f"Category agreement between '{c1.category}' and '{c2.category}'",
+            "observed_value": c1.category or "Unspecified",
+        },
+        {
+            "name": "Temporal Proximity",
+            "score": round(time_sim, 2),
+            "direction": "supports" if time_sim >= 0.7 else "neutral",
+            "explanation": f"Filed {days_diff} days apart" if days_diff is not None else "Timestamp unverified",
+            "observed_value": f"{days_diff} days" if days_diff is not None else "N/A",
+        },
+    ]
+
+    # Concise human-readable explanation rationale
     explanation = (
         f"{band}-confidence candidate ({overall_score:.2f}) at same institution. "
         f"Description similarity is {desc_sim:.2f} across bureaus '{c1.bureau}' and '{c2.bureau}'."
@@ -142,20 +241,72 @@ def score_complaint_pair(c1: Complaint, c2: Complaint) -> Tuple[float, str, Dict
         "overall_score": overall_score,
         "score_band": band,
         "description_similarity": round(desc_sim, 4),
+        "matched_terms": matched_terms,
         "category_match": cat_match,
         "category_similarity": round(cat_sim, 2),
         "temporal_proximity_days": days_diff,
         "temporal_similarity": round(time_sim, 2),
+        "reference_similarity": round(ref_sim, 2),
+        "reference_note": ref_desc,
         "institution_match": True,
         "signals": signals,
+        "signals_list": signals_list,
+        "summary_reasoning": explanation,
         "weights": {
             "description": WEIGHT_DESCRIPTION,
             "category": WEIGHT_CATEGORY,
             "temporal": WEIGHT_TEMPORAL,
+            "reference": WEIGHT_REFERENCE,
+        },
+        # Frontend EvidencePayload structured compatibility sub-objects
+        "category_compatibility": {
+            "compatible": cat_match,
+            "category_a": c1.category or "",
+            "category_b": c2.category or "",
+            "similarity": cat_sim,
+        },
+        "date_proximity": {
+            "days_apart": days_diff if days_diff is not None else 0,
+            "score": time_sim,
+        },
+        "text_similarity": {
+            "score": round(desc_sim, 4),
+            "method": "tfidf_cosine",
+            "excerpt_overlap": matched_terms,
         },
     }
 
     return overall_score, band, evidence, explanation
+
+
+def baseline_score_complaint_pair(c1: Complaint, c2: Complaint) -> Tuple[float, str, Dict[str, Any], str]:
+    """
+    Simple keyword & exact-match baseline matcher for comparative benchmarking.
+    Does NOT use TF-IDF, sublinear scaling, category weights, or temporal proximity.
+    Relies purely on token intersection (Jaccard similarity on raw words) and exact institution match.
+    """
+    if c1.institution_id != c2.institution_id:
+        return 0.0, "Weak", {"institution_match": False, "method": "simple_keyword_baseline"}, "Different institutions"
+
+    t1 = set(re.findall(r"\b[a-z]{3,}\b", (c1.description or "").lower()))
+    t2 = set(re.findall(r"\b[a-z]{3,}\b", (c2.description or "").lower()))
+
+    if not t1 or not t2:
+        return 0.0, "Weak", {"method": "simple_keyword_baseline"}, "Empty text"
+
+    jaccard = len(t1 & t2) / len(t1 | t2)
+    score = round(max(0.0, min(1.0, jaccard)), 4)
+    band = "High" if score >= 0.50 else "Review" if score >= 0.25 else "Weak"
+
+    evidence = {
+        "overall_score": score,
+        "score_band": band,
+        "method": "simple_keyword_baseline",
+        "jaccard_similarity": score,
+        "overlapping_word_count": len(t1 & t2),
+    }
+    explanation = f"Baseline keyword Jaccard overlap of {score:.2f}."
+    return score, band, evidence, explanation
 
 
 def suggest_for_complaint(

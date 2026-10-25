@@ -216,3 +216,101 @@ def test_api_matching_suggest_all_batch(client: TestClient, db_session: Session)
     data_repeat = res_repeat.json()
     assert data_repeat["suggestions_created"] == 0
     assert data_repeat["suggestions_reused"] >= 1
+
+
+def test_extract_matched_terms_and_short_text():
+    """Verify keyword overlap extraction and robust handling of short/whitespace strings."""
+    from app.services.matching_service import extract_matched_terms, compute_text_similarity
+
+    t1 = "Severe ragging and harassment reported by hostel freshmen."
+    t2 = "Freshmen hostel residents report late-night harassment."
+
+    terms = extract_matched_terms(t1, t2)
+    assert "freshmen" in terms
+    assert "harassment" in terms
+    assert "hostel" in terms
+    # Stopwords like 'and', 'by' must be excluded
+    assert "and" not in terms
+    assert "by" not in terms
+
+    # Edge cases
+    assert compute_text_similarity("abc", "valid text here") == 0.0
+    assert compute_text_similarity("   ", "   ") == 0.0
+    assert extract_matched_terms("", "any text") == []
+
+
+def test_reference_similarity_behavior():
+    """Verify reference comparison logic."""
+    from app.services.matching_service import compute_reference_similarity
+
+    # Exact match
+    score_exact, desc_exact = compute_reference_similarity("CASE-2026-101", "CASE-2026-101")
+    assert score_exact == 1.0
+    assert "Identical" in desc_exact
+
+    # Shared root
+    score_root, desc_root = compute_reference_similarity("AICTE-REV-101", "AICTE-REV-101-SUPP")
+    assert score_root == 0.7
+    assert "Shared reference root" in desc_root
+
+    # Distinct references (cross-bureau expected)
+    score_diff, desc_diff = compute_reference_similarity("BUR-A-101", "BUR-B-999")
+    assert score_diff == 0.0
+    assert "Distinct references" in desc_diff
+
+    # Missing reference
+    score_none, desc_none = compute_reference_similarity(None, "BUR-A-101")
+    assert score_none == 0.0
+
+
+def test_baseline_matcher_vs_caseweave_matcher():
+    """Verify that simple baseline matcher computes Jaccard and handles mismatches."""
+    from app.services.matching_service import baseline_score_complaint_pair
+
+    now = datetime(2026, 10, 24, 12, 0, 0, tzinfo=timezone.utc)
+    c1 = Complaint(
+        institution_id=1,
+        bureau="Cell A",
+        description="Ragging incident in campus hostel block.",
+        created_at=now,
+    )
+    c2 = Complaint(
+        institution_id=1,
+        bureau="Cell B",
+        description="Ragging incident in hostel rooms.",
+        created_at=now,
+    )
+    c_diff_inst = Complaint(
+        institution_id=2,
+        bureau="Cell A",
+        description="Ragging incident in campus hostel block.",
+        created_at=now,
+    )
+
+    base_score, base_band, base_ev, _ = baseline_score_complaint_pair(c1, c2)
+    assert base_score > 0.0
+    assert base_ev["method"] == "simple_keyword_baseline"
+
+    # Different institutions rejected by baseline as well
+    score_diff, _, ev_diff, _ = baseline_score_complaint_pair(c1, c_diff_inst)
+    assert score_diff == 0.0
+    assert ev_diff["institution_match"] is False
+
+
+def test_frontend_evidence_payload_compatibility(db_session: Session):
+    """Verify that the evidence dictionary contains all sub-objects required by the frontend EvidencePayload."""
+    inst1, inst2, c1, c2, c3, c4 = _setup_matching_data(db_session)
+    score, band, ev, expl = score_complaint_pair(c1, c2)
+
+    # Check frontend-required keys
+    assert "category_compatibility" in ev
+    assert "date_proximity" in ev
+    assert "text_similarity" in ev
+    assert "signals_list" in ev
+    assert "summary_reasoning" in ev
+    assert "matched_terms" in ev
+
+    assert ev["category_compatibility"]["compatible"] is True
+    assert ev["text_similarity"]["method"] == "tfidf_cosine"
+    assert isinstance(ev["signals_list"], list)
+    assert len(ev["signals_list"]) >= 4
