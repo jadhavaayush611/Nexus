@@ -1,0 +1,96 @@
+/**
+ * CaseWeave Design Tokens — Institutional Precision
+ * Restrained, legible, high-contrast, human-made operations console.
+ */
+
+:root {
+  /* Brand & Core Palette */
+  --color-ink-navy: #172B36;
+  --color-ink-navy-hover: #101F27;
+  --color-deep-teal: #146B62;
+  --color-deep-teal-hover: #0E534C;
+  --color-deep-teal-light: #EBF4F3;
+  --color-canvas: #F4F6F5;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F8FAF9;
+  --color-surface-hover: #F0F4F3;
+  --color-slate-border: #D7E0E3;
+  --color-slate-border-strong: #A8B8BD;
+  --color-accent-sand: #B57A4B;
+  --color-accent-sand-subtle: #F8F3EF;
+
+  /* Typography Colors */
+  --color-text-primary: #172B36;
+  --color-text-secondary: #4A5D65;
+  --color-text-muted: #72848C;
+  --color-text-inverse: #FFFFFF;
+
+  /* Semantic Status Colors (Always paired with explicit text labels) */
+  --color-success-text: #1B633C;
+  --color-success-bg: #EDF7F0;
+  --color-success-border: #C3E6CF;
+
+  --color-warning-text: #8A4F00;
+  --color-warning-bg: #FFF7EB;
+  --color-warning-border: #FDE0B2;
+
+  --color-error-text: #A31D1D;
+  --color-error-bg: #FDF2F2;
+  --color-error-border: #F8C8C8;
+
+  --color-info-text: #1F4862;
+  --color-info-bg: #EDF4F9;
+  --color-info-border: #CDE0EE;
+
+  /* Typography Scales */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.8125rem;  /* 13px */
+  --font-size-base: 0.875rem; /* 14px */
+  --font-size-md: 1rem;       /* 16px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* 4px-based Spacing Grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Corner Radii (Modest, strictly avoiding giant pill buttons) */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Shadows (Subtle, non-floaty elevation) */
+  --shadow-sm: 0 1px 2px rgba(23, 43, 54, 0.05);
+  --shadow-md: 0 3px 6px -1px rgba(23, 43, 54, 0.08), 0 2px 4px -2px rgba(23, 43, 54, 0.04);
+  --shadow-lg: 0 8px 16px -4px rgba(23, 43, 54, 0.1), 0 4px 6px -3px rgba(23, 43, 54, 0.05);
+
+  /* Layout Proportions */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --topbar-height: 60px;
+  --content-max-width: 1440px;
+
+  /* Accessible Focus */
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-deep-teal);
+  --focus-outline: 2px solid var(--color-deep-teal);
+}

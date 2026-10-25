@@ -1,0 +1,188 @@
+/**
+ * RelationshipReview Page CSS
+ * Three-column operational review workspace for PS SIH26264.
+ */
+
+.cw-review-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Mobile Nav Switcher (hidden on desktop) */
+.cw-review-mobile-nav {
+  display: none;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 4px;
+}
+
+.cw-review-mobile-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.cw-review-mobile-tab--active {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-deep-teal);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.cw-review-mobile-tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Mobile Back Bar */
+.cw-review-mobile-back-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-sm);
+}
+
+.cw-review-mobile-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-deep-teal);
+  cursor: pointer;
+  padding: 0;
+}
+
+.cw-review-mobile-back-btn:hover {
+  text-decoration: underline;
+}
+
+/* Three-column Workspace */
+.cw-review-workspace {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1.35fr) minmax(320px, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+  min-height: calc(100vh - 210px);
+}
+
+.cw-review-workspace__col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cw-review-workspace__col--queue {
+  max-height: calc(100vh - 210px);
+}
+
+.cw-review-workspace__col--comparison {
+  max-height: calc(100vh - 210px);
+}
+
+.cw-review-workspace__col--evidence {
+  max-height: calc(100vh - 210px);
+  overflow-y: auto;
+}
+
+.cw-review-right-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Empty State in workspace */
+.cw-review-workspace__empty {
+  grid-column: 2 / span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-12) var(--space-6);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1380px) {
+  .cw-review-workspace {
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .cw-review-workspace__col--comparison {
+    max-height: none;
+  }
+
+  .cw-review-workspace__col--evidence {
+    grid-column: 1 / span 2;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .cw-review-right-stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  .cw-review-right-stack > :nth-child(3) {
+    grid-column: 1 / span 2;
+  }
+}
+
+@media (max-width: 960px) {
+  .cw-review-mobile-nav {
+    display: flex;
+  }
+
+  .cw-review-mobile-back-bar {
+    display: flex;
+  }
+
+  .cw-review-workspace {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .cw-review-workspace__col--mobile-hidden {
+    display: none !important;
+  }
+
+  .cw-review-workspace__col--queue,
+  .cw-review-workspace__col--comparison,
+  .cw-review-workspace__col--evidence {
+    max-height: none;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .cw-review-right-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}

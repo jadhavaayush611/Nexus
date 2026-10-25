@@ -1,0 +1,121 @@
+/**
+ * BaselineComparisonTable CSS
+ * Side-by-side performance table showing deltas vs simple keyword baseline.
+ */
+
+.cw-baseline-wrapper {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-slate-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cw-baseline-wrapper--empty {
+  background-color: var(--color-surface-subtle);
+  border-style: dashed;
+}
+
+.cw-baseline-empty-text {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.cw-baseline-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.cw-baseline-title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-ink-navy);
+}
+
+.cw-baseline-subtitle {
+  margin: 2px 0 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.cw-baseline-table-container {
+  overflow-x: auto;
+}
+
+.cw-baseline-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-xs);
+}
+
+.cw-baseline-th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-slate-border);
+  background-color: var(--color-surface-subtle);
+}
+
+.cw-baseline-td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-slate-border);
+  vertical-align: middle;
+}
+
+.cw-baseline-td--name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cw-baseline-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink-navy);
+}
+
+.cw-baseline-name--active {
+  color: var(--color-deep-teal);
+  font-weight: var(--font-weight-semibold);
+}
+
+.cw-baseline-sub {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+
+.cw-baseline-td--highlight {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-ink-navy);
+}
+
+.cw-baseline-delta {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  margin-top: 2px;
+}
+
+.cw-baseline-delta--pos {
+  color: var(--color-success-text);
+}
+
+.cw-baseline-td--desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-width: 380px;
+}
+
+.cw-baseline-row--caseweave {
+  background-color: var(--color-surface-subtle);
+}

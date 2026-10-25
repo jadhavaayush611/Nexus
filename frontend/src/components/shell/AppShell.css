@@ -1,0 +1,45 @@
+.cw-app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-canvas);
+}
+
+.cw-skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-deep-teal);
+  color: #ffffff;
+  padding: 8px var(--space-4);
+  z-index: 200;
+  border-radius: 0 0 var(--radius-sm) 0;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  transition: top 0.15s ease;
+}
+
+.cw-skip-link:focus {
+  top: 0;
+}
+
+.cw-app-shell__body {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 33px); /* account for synthetic banner */
+  position: relative;
+}
+
+.cw-app-shell__workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cw-main-content {
+  flex: 1;
+  padding: 0;
+  outline: none;
+  overflow-y: auto;
+}
